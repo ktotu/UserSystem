@@ -7,7 +7,7 @@
 
 declare(strict_types = 1);
 
-namespace Bestaford\UserSystem\util;
+namespace Bestaford\UserSystem\utils;
 
 use Bestaford\UserSystem\UserSystem;
 use SQLite3;
@@ -54,14 +54,14 @@ class Database {
     /**
      * @param string $name
      */
-    public function createTable(string $name) {
+    public function createTable(string $name) : void {
         $this->database->exec(stream_get_contents($this->plugin->getResource($name.".sql")));
     }
 
     /**
      * @param string $query
      */
-    public function prepare(string $query) {
+    public function prepare(string $query) : void {
         $this->statement = $this->database->prepare($query);
     }
 
@@ -69,11 +69,11 @@ class Database {
      * @param string $name
      * @param mixed $value
      */
-    public function bind(string $name, $value) {
+    public function bind(string $name, $value) : void {
         $this->statement->bindValue($name, $value);
     }
 
-    public function execute() {
+    public function execute() : void {
         $this->result = $this->statement->execute();
     }
 
