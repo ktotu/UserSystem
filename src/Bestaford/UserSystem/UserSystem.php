@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace Bestaford\UserSystem;
 
 use pocketmine\plugin\PluginBase;
+use Bestaford\UserSystem\util\Database;
+use Bestaford\UserSystem\util\EventListener;
 
 class UserSystem extends PluginBase {
 

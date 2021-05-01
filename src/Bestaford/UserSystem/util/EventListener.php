@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Bestaford\UserSystem;
+namespace Bestaford\UserSystem\util;
 
 use pocketmine\event\Listener;
 

@@ -2,8 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Bestaford\UserSystem;
+namespace Bestaford\UserSystem\util;
 
+use Bestaford\UserSystem\UserSystem;
 use SQLite3;
 use SQLite3Stmt;
 use SQLite3Result;
@@ -41,7 +42,7 @@ class Database {
      */
     public function __construct(UserSystem $plugin, string $name) {
         $this->plugin = $plugin;
-        $this->database = new SQLite3($plugin->getDataFolder() . $name . ".db");
+        $this->database = new SQLite3($plugin->getDataFolder().$name.".db");
         $this->createTable($name);
     }
 
@@ -49,7 +50,7 @@ class Database {
      * @param string $name
      */
     public function createTable(string $name) {
-        $this->database->exec(stream_get_contents($this->plugin->getResource($name . ".sql")));
+        $this->database->exec(stream_get_contents($this->plugin->getResource($name.".sql")));
     }
 
     /**
