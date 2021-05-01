@@ -53,7 +53,7 @@ abstract class Form implements IForm {
     public function handleResponse(Player $player, $data) : void {
         $this->processData($data);
         $callable = $this->getCallable();
-        if ($callable !== null) {
+        if($callable !== null) {
             $callable($player, $data);
         }
     }

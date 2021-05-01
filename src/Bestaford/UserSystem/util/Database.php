@@ -62,7 +62,7 @@ class Database {
 
     /**
      * @param string $name
-     * @param $value
+     * @param mixed $value
      */
     public function bind(string $name, $value) {
         $this->statement->bindValue($name, $value);
@@ -76,6 +76,12 @@ class Database {
      * @return array
      */
     public function get() : array {
-        return $this->result->fetchArray(SQLITE3_ASSOC);
+        $row = [];
+        $i = 0;
+        while($res = $this->result->fetchArray(SQLITE3_ASSOC)) {
+            $row[$i] = $res;
+            $i++;
+        }
+        return $row;
     }
 }

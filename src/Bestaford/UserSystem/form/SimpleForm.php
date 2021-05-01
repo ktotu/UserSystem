@@ -79,7 +79,7 @@ class SimpleForm extends Form {
      */
     public function addButton(string $text, int $imageType = -1, string $imagePath = "", ?string $label = null) : void {
         $content = ["text" => $text];
-        if ($imageType !== -1) {
+        if($imageType !== -1) {
             $content["image"]["type"] = $imageType === 0 ? "path" : "url";
             $content["image"]["data"] = $imagePath;
         }
