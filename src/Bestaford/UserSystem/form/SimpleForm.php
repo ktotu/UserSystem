@@ -9,6 +9,8 @@ declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\form;
 
+use Bestaford\UserSystem\UserSystem;
+
 class SimpleForm extends Form {
 
     const IMAGE_TYPE_PATH = 0;
@@ -27,9 +29,10 @@ class SimpleForm extends Form {
     /**
      * SimpleForm constructor.
      * @param callable|null $callable
+     * @param UserSystem $plugin
      */
-    public function __construct(?callable $callable) {
-        parent::__construct($callable);
+    public function __construct(?callable $callable, UserSystem $plugin) {
+        parent::__construct($callable, $plugin);
         $this->data["type"] = "form";
         $this->data["title"] = "";
         $this->data["content"] = $this->content;

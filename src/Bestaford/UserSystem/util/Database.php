@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * @author Bestaford
+ * @link https://talk.24serv.pro/u/bestaford
+ */
+
 declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\util;
@@ -18,22 +23,22 @@ class Database {
     /**
      * @var UserSystem
      */
-    public UserSystem $plugin;
+    private UserSystem $plugin;
 
     /**
      * @var SQLite3
      */
-    public SQLite3 $database;
+    private SQLite3 $database;
 
     /**
      * @var SQLite3Stmt
      */
-    public SQLite3Stmt $statement;
+    private SQLite3Stmt $statement;
 
     /**
      * @var SQLite3Result
      */
-    public SQLite3Result $result;
+    private SQLite3Result $result;
 
     /**
      * Database constructor.

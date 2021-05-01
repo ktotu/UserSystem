@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\form;
 
+use Bestaford\UserSystem\UserSystem;
 use pocketmine\form\Form as IForm;
 use pocketmine\Player;
 
@@ -25,11 +26,18 @@ abstract class Form implements IForm {
     private $callable;
 
     /**
+     * @var UserSystem
+     */
+    private UserSystem $plugin;
+
+    /**
      * Form constructor.
      * @param callable|null $callable
+     * @param UserSystem $plugin
      */
-    public function __construct(?callable $callable) {
+    public function __construct(?callable $callable, UserSystem $plugin) {
         $this->callable = $callable;
+        $this->plugin = $plugin;
     }
 
     /**
@@ -69,5 +77,12 @@ abstract class Form implements IForm {
      */
     public function jsonSerialize() : array {
         return $this->data;
+    }
+
+    /**
+     * @return UserSystem
+     */
+    public function getPlugin() : UserSystem {
+        return $this->plugin;
     }
 }
