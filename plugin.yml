@@ -1,0 +1,5 @@
+name: UserSystem
+main: Bestaford\UserSystem\UserSystem
+api: 3.19.1
+version: 2.0
+author: https://talk.24serv.pro/u/bestaford
