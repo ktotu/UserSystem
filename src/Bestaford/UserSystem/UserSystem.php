@@ -15,7 +15,8 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
-use Bestaford\UserSystem\util\Database;
+use Bestaford\UserSystem\utils\Database;
+use pocketmine\utils\Config;
 
 class UserSystem extends PluginBase implements Listener {
 
@@ -25,10 +26,22 @@ class UserSystem extends PluginBase implements Listener {
     private Database $database;
 
     /**
+     * @var Config
+     */
+    private Config $config;
+
+    /**
+     * @var array
+     */
+    private array $players = [];
+
+    /**
      * Plugin start point.
      */
     public function onEnable() : void {
         $this->database = new Database($this, "users");
+        $this->saveDefaultConfig();
+        $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
@@ -65,5 +78,14 @@ class UserSystem extends PluginBase implements Listener {
      */
     public function isLogined(Player $player) : bool {
         return false;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return bool|mixed
+     */
+    public function getProperty(string $key, $default = false) {
+        return $this->config->get($key, $default);
     }
 }
