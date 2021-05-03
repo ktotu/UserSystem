@@ -1,10 +1,5 @@
 <?php
 
-/*
- * @author Bestaford
- * @link https://talk.24serv.pro/u/bestaford
- */
-
 declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\utils;
@@ -16,28 +11,22 @@ use SQLite3Result;
 
 /**
  * Class Database
+ * @author Bestaford
+ * @link https://talk.24serv.pro/u/bestaford
  * @package Bestaford\UserSystem
  */
 class Database {
 
-    /**
-     * @var UserSystem
-     */
+    /** @var UserSystem */
     private UserSystem $plugin;
 
-    /**
-     * @var SQLite3
-     */
+    /** @var SQLite3 */
     private SQLite3 $database;
 
-    /**
-     * @var SQLite3Stmt
-     */
+    /** @var SQLite3Stmt */
     private SQLite3Stmt $statement;
 
-    /**
-     * @var SQLite3Result
-     */
+    /** @var SQLite3Result */
     private SQLite3Result $result;
 
     /**

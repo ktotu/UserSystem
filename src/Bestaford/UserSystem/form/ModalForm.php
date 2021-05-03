@@ -1,21 +1,20 @@
 <?php
 
-/*
- * @author jojoe77777
- * @link https://github.com/jojoe77777/FormAPI
- */
-
 declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\form;
 
 use Bestaford\UserSystem\UserSystem;
 
+/**
+ * Class ModalForm
+ * @author jojoe77777
+ * @link https://github.com/jojoe77777/FormAPI
+ * @package Bestaford\UserSystem\form
+ */
 class ModalForm extends Form {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private string $content = "";
 
     /**

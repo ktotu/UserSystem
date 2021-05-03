@@ -1,10 +1,5 @@
 <?php
 
-/*
- * @author Bestaford
- * @link https://talk.24serv.pro/u/bestaford
- */
-
 declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\form;
@@ -12,6 +7,12 @@ namespace Bestaford\UserSystem\form;
 use Bestaford\UserSystem\UserSystem;
 use pocketmine\Player;
 
+/**
+ * Class LoginForm
+ * @author Bestaford
+ * @link https://talk.24serv.pro/u/bestaford
+ * @package Bestaford\UserSystem\form
+ */
 class LoginForm extends CustomForm {
 
     /**

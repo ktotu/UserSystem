@@ -1,21 +1,20 @@
 <?php
 
-/*
- * @author jojoe77777
- * @link https://github.com/jojoe77777/FormAPI
- */
-
 declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\form;
 
 use Bestaford\UserSystem\UserSystem;
 
+/**
+ * Class CustomForm
+ * @author jojoe77777
+ * @link https://github.com/jojoe77777/FormAPI
+ * @package Bestaford\UserSystem\form
+ */
 class CustomForm extends Form {
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private array $labelMap = [];
 
     /**

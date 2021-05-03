@@ -1,10 +1,5 @@
 <?php
 
-/*
- * @author Bestaford
- * @link https://talk.24serv.pro/u/bestaford
- */
-
 declare(strict_types = 1);
 
 namespace Bestaford\UserSystem;
@@ -18,21 +13,21 @@ use pocketmine\plugin\PluginBase;
 use Bestaford\UserSystem\utils\Database;
 use pocketmine\utils\Config;
 
+/**
+ * Class UserSystem
+ * @author Bestaford
+ * @link https://talk.24serv.pro/u/bestaford
+ * @package Bestaford\UserSystem
+ */
 class UserSystem extends PluginBase implements Listener {
 
-    /**
-     * @var Database
-     */
+    /** @var Database */
     private Database $database;
 
-    /**
-     * @var Config
-     */
+    /** @var Config */
     private Config $config;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private array $players = [];
 
     /**
@@ -46,6 +41,8 @@ class UserSystem extends PluginBase implements Listener {
     }
 
     /**
+     * Send registration or login form when player join.
+     *
      * @param PlayerJoinEvent $event
      */
     public function onPlayerJoin(PlayerJoinEvent $event) : void {
@@ -64,6 +61,7 @@ class UserSystem extends PluginBase implements Listener {
     /**
      * @param Player $player
      * @return bool
+     * @api
      */
     public function isRegistered(Player $player) : bool {
         $this->database->prepare("SELECT * FROM users WHERE name = :name");
@@ -75,15 +73,19 @@ class UserSystem extends PluginBase implements Listener {
     /**
      * @param Player $player
      * @return bool
+     * @api
      */
     public function isLogined(Player $player) : bool {
         return false;
     }
 
     /**
+     * Returns setting from configuration file by key.
+     *
      * @param string $key
      * @param mixed $default
      * @return bool|mixed
+     * @api
      */
     public function getProperty(string $key, $default = false) {
         return $this->config->get($key, $default);

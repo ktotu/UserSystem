@@ -1,10 +1,5 @@
 <?php
 
-/*
- * @author jojoe77777
- * @link https://github.com/jojoe77777/FormAPI
- */
-
 declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\form;
@@ -13,21 +8,21 @@ use Bestaford\UserSystem\UserSystem;
 use pocketmine\form\Form as IForm;
 use pocketmine\Player;
 
+/**
+ * Class Form
+ * @author jojoe77777
+ * @link https://github.com/jojoe77777/FormAPI
+ * @package Bestaford\UserSystem\form
+ */
 abstract class Form implements IForm {
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected array $data = [];
 
-    /**
-     * @var callable|null
-     */
+    /** @var callable|null */
     private $callable;
 
-    /**
-     * @var UserSystem
-     */
+    /** @var UserSystem */
     private UserSystem $plugin;
 
     /**
