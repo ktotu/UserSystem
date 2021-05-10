@@ -16,3 +16,4 @@ A PocketMine-MP plugin that adds form auth system to your server
 * [ ] Hides the password if it was accidentally entered into the chat
 * [ ] Safe password storage
 * [ ] Password recovering
+* [ ] Account management form
