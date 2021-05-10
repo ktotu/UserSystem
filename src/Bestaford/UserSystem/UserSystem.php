@@ -37,7 +37,6 @@ class UserSystem extends PluginBase implements Listener {
     public function onEnable() : void {
         $this->database = new Database($this, "users");
         $this->database->createTable("users");
-        $this->database->createTable("passwords");
         $this->saveResource("config.yml", true); //TODO: save default config without replace
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
