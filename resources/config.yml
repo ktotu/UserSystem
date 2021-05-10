@@ -4,8 +4,8 @@ registration:
     title: "Registration"
     label: "Label"
     input:
-      text: ""
-      placeholder: ""
-      default: ""
-    success: ""
+      text: "Text"
+      placeholder: "Placeholder"
+      default: "Default"
+    success: "Success"
 ...
