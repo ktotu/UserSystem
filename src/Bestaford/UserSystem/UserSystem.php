@@ -39,6 +39,7 @@ class UserSystem extends PluginBase implements Listener {
         $this->saveResource("config.yml", true); //TODO: save default config without replace
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
+        $this->getLogger()->info("Plugin enabled successfully.");
     }
 
     /**
@@ -118,5 +119,17 @@ class UserSystem extends PluginBase implements Listener {
             }
         }
         return $data;
+    }
+
+    public function onDisable() {
+        $this->getLogger()->info("Plugin disabled successfully.");
+    }
+
+    /**
+     * @param string $text
+     * @return bool
+     */
+    public static function isValidPassword(string $text) : bool {
+        return preg_match("/^(?=\S+[0-9])(?=\S+[a-z])(?=\S+[A-Z])(?=\S+\W).{8,}$/", $text) == 1;
     }
 }
