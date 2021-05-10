@@ -31,9 +31,6 @@ class UserSystem extends PluginBase implements Listener {
 
     //TODO: sessions array
 
-    /**
-     * Plugin start point.
-     */
     public function onEnable() : void {
         $this->database = new Database($this, "users");
         $this->database->createTable("users");
@@ -78,6 +75,29 @@ class UserSystem extends PluginBase implements Listener {
      */
     public function isLogined(Player $player) : bool {
         return false;
+    }
+
+    /**
+     * @param Player $player
+     * @param string $password
+     * @return bool
+     */
+    public function register(Player $player, string $password) : bool {
+        if($this->isRegistered($player)) {
+            return false;
+        }
+        $this->database->prepare("INSERT INTO users (name, full_name, display_name, password_hash, address, uuid, xuid) VALUES (:name, :full_name, :display_name, :password_hash, :address, :uuid, :xuid)");
+        $this->database->bind(":name", strtolower($player->getName()));
+        $this->database->bind(":full_name", $player->getName());
+        $this->database->bind(":display_name", $player->getDisplayName());
+        $this->database->bind(":password_hash", password_hash($password, PASSWORD_DEFAULT));
+        $this->database->bind(":address", $player->getAddress());
+        $this->database->bind(":uuid", $player->getUniqueId()->toString());
+        $this->database->bind(":xuid", $player->getXuid());
+        $this->database->execute();
+        return $this->isRegistered($player);
+
+        //TODO: update player data every join/quit or DisplayName change
     }
 
     /**

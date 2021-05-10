@@ -24,8 +24,14 @@ class RegistrationForm extends CustomForm {
             if($data === null) {
                 return;
             }
+            //TODO: password validation
+            $this->getPlugin()->register($player, $data["password"]);
         }, $plugin);
         $this->setTitle($this->getPlugin()->getProperty("registration.form.title"));
         $this->addLabel($this->getPlugin()->getProperty("registration.form.label"));
+        $text = $this->getPlugin()->getProperty("registration.form.input.text");
+        $placeholder = $this->getPlugin()->getProperty("registration.form.input.placeholder");
+        $default = $this->getPlugin()->getProperty("registration.form.input.default");
+        $this->addInput($text, $placeholder, $default, "password");
     }
 }
