@@ -25,7 +25,7 @@ class RegistrationForm extends CustomForm {
                 return;
             }
         }, $plugin);
-        $this->setTitle("register");
-        $this->addLabel("register");
+        $this->setTitle($this->getPlugin()->getProperty("registration.form.title"));
+        $this->addLabel($this->getPlugin()->getProperty("registration.form.label"));
     }
 }

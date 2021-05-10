@@ -21,21 +21,22 @@ use pocketmine\utils\Config;
  */
 class UserSystem extends PluginBase implements Listener {
 
+    const ERROR_MISSING_PROPERTY = "Missing configuration file property: ";
+
     /** @var Database */
     private Database $database;
 
     /** @var Config */
     private Config $config;
 
-    /** @var array */
-    private array $players = [];
+    //TODO: sessions array
 
     /**
      * Plugin start point.
      */
     public function onEnable() : void {
         $this->database = new Database($this, "users");
-        $this->saveDefaultConfig();
+        $this->saveResource("config.yml", true); //TODO: save default config without replace
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
@@ -61,7 +62,6 @@ class UserSystem extends PluginBase implements Listener {
     /**
      * @param Player $player
      * @return bool
-     * @api
      */
     public function isRegistered(Player $player) : bool {
         $this->database->prepare("SELECT * FROM users WHERE name = :name");
@@ -73,7 +73,6 @@ class UserSystem extends PluginBase implements Listener {
     /**
      * @param Player $player
      * @return bool
-     * @api
      */
     public function isLogined(Player $player) : bool {
         return false;
@@ -82,12 +81,42 @@ class UserSystem extends PluginBase implements Listener {
     /**
      * Returns setting from configuration file by key.
      *
-     * @param string $key
-     * @param mixed $default
-     * @return bool|mixed
-     * @api
+     * @param string $query
+     * @return mixed
      */
-    public function getProperty(string $key, $default = false) {
-        return $this->config->get($key, $default);
+    public function getProperty(string $query) {
+        $keys = explode(".", $query);
+        if(count($keys) == 1 && $keys[0] == $query) {
+            $key = $keys[0];
+            if($this->config->exists($key)) {
+                return $this->config->get($key);
+            } else {
+                $error = self::ERROR_MISSING_PROPERTY.$key;
+                $this->getLogger()->error($error);
+                return $error;
+            }
+        } else {
+            $data = [];
+            foreach($keys as $key) {
+                if(empty($data)) {
+                    if($this->config->exists($key)) {
+                        $data = $this->config->get($key);
+                    } else {
+                        $error = self::ERROR_MISSING_PROPERTY.$key." [$query]";
+                        $this->getLogger()->error($error);
+                        return $error;
+                    }
+                } else {
+                    if(is_array($data) && isset($data[$key])) {
+                        $data = $data[$key];
+                    } else {
+                        $error = self::ERROR_MISSING_PROPERTY.$key." [$query]";
+                        $this->getLogger()->error($error);
+                        return $error;
+                    }
+                }
+            }
+        }
+        return $data;
     }
 }

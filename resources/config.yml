@@ -1,2 +1,11 @@
 ---
+registration:
+  form:
+    title: "Registration"
+    label: "Label"
+    input:
+      text: ""
+      placeholder: ""
+      default: ""
+    success: ""
 ...
