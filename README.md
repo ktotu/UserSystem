@@ -17,3 +17,4 @@ A PocketMine-MP plugin that adds form auth system to your server
 * [ ] Safe password storage
 * [ ] Password recovering
 * [ ] Account management form
+* [ ] Both CLI and Form interfaces (for multiverse cores)
