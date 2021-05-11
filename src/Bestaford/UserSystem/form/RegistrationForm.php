@@ -18,14 +18,20 @@ class RegistrationForm extends CustomForm {
     /**
      * RegistrationForm constructor.
      * @param UserSystem $plugin
+     * @param bool $error
      */
-    public function __construct(UserSystem $plugin) {
+    public function __construct(UserSystem $plugin, bool $error = false) {
         parent::__construct(function(Player $player, array $data = null) {
             if($data === null) {
+                $player->sendForm(new RegistrationForm($this->getPlugin()));
                 return;
             }
-            //TODO: password validation
-            $this->getPlugin()->register($player, $data["password"]);
+            $password = $data["password"];
+            if(UserSystem::isValidPassword($password)) {
+                $this->getPlugin()->register($player, $password);
+            } else {
+                $player->sendForm(new RegistrationForm($this->getPlugin(), true));
+            }
         }, $plugin);
         $this->setTitle($this->getPlugin()->getProperty("registration.form.title"));
         $this->addLabel($this->getPlugin()->getProperty("registration.form.label"));
