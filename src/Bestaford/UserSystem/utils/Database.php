@@ -37,6 +37,7 @@ class Database {
     public function __construct(UserSystem $plugin, string $name) {
         $this->plugin = $plugin;
         $this->database = new SQLite3($plugin->getDataFolder().$name.".db");
+        $this->createTable($name);
     }
 
     /**
