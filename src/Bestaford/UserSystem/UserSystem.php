@@ -10,8 +10,8 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
-use Bestaford\UserSystem\utils\Database;
 use pocketmine\utils\Config;
+use SQLite3;
 
 /**
  * Class UserSystem
@@ -23,16 +23,15 @@ class UserSystem extends PluginBase implements Listener {
 
     const ERROR_MISSING_PROPERTY = "Missing configuration file property: ";
 
-    /** @var Database */
-    private Database $database;
+    /** @var SQLite3 */
+    private SQLite3 $database;
 
     /** @var Config */
     private Config $config;
 
-    //TODO: sessions array
-
     public function onEnable() : void {
-        $this->database = new Database($this, "users");
+        $this->database = new SQLite3($this->getDataFolder()."users.db");
+        $this->database->exec(stream_get_contents($this->getResource("users.sql")));
         $this->saveResource("config.yml", true); //TODO: save default config without replace
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
@@ -62,10 +61,8 @@ class UserSystem extends PluginBase implements Listener {
      * @return bool
      */
     public function isRegistered(Player $player) : bool {
-        $this->database->prepare("SELECT * FROM users WHERE name = :name");
-        $this->database->bind(":name", $player->getName());
-        $this->database->execute();
-        return count($this->database->get()) > 0;
+        $name = strtolower($player->getName());
+        return !is_null($this->database->querySingle("SELECT * FROM users WHERE name = '$name'"));
     }
 
     /**
@@ -85,18 +82,27 @@ class UserSystem extends PluginBase implements Listener {
         if($this->isRegistered($player)) {
             return false;
         }
-        $this->database->prepare("INSERT INTO users (name, full_name, display_name, password_hash, address, uuid, xuid) VALUES (:name, :full_name, :display_name, :password_hash, :address, :uuid, :xuid)");
-        $this->database->bind(":name", strtolower($player->getName()));
-        $this->database->bind(":full_name", $player->getName());
-        $this->database->bind(":display_name", $player->getDisplayName());
-        $this->database->bind(":password_hash", password_hash($password, PASSWORD_DEFAULT));
-        $this->database->bind(":address", $player->getAddress());
-        $this->database->bind(":uuid", $player->getUniqueId()->toString());
-        $this->database->bind(":xuid", $player->getXuid());
-        $this->database->execute();
-        return $this->isRegistered($player);
+    }
 
-        //TODO: update player data every join/quit or DisplayName change
+    /**
+     * Writes data about a new player to the database.
+     * Returns true if the row was written successfully, false otherwise.
+     *
+     * @param Player $player
+     * @param string $password
+     * @return bool
+     */
+    private function addUser(Player $player, string $password) : bool {
+        $statement = $this->database->prepare("INSERT INTO users (name, full_name, display_name, password_hash, address, uuid, xuid) VALUES (:name, :full_name, :display_name, :password_hash, :address, :uuid, :xuid)");
+        $statement->bindValue(":name", strtolower($player->getName()));
+        $statement->bindValue(":full_name", $player->getName());
+        $statement->bindValue(":display_name", $player->getDisplayName());
+        $statement->bindValue(":password_hash", password_hash($password, PASSWORD_DEFAULT));
+        $statement->bindValue(":address", $player->getAddress());
+        $statement->bindValue(":uuid", $player->getUniqueId()->toString());
+        $statement->bindValue(":xuid", $player->getXuid());
+        $statement->execute();
+        return $this->database->changes() == 1;
     }
 
     /**
