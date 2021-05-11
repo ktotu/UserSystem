@@ -57,6 +57,8 @@ class UserSystem extends PluginBase implements Listener {
     }
 
     /**
+     * Returns true if the player is registered, false otherwise. Name is case insensitive.
+     *
      * @param Player $player
      * @return bool
      */
@@ -66,14 +68,30 @@ class UserSystem extends PluginBase implements Listener {
     }
 
     /**
+     * Returns true when player has online or offline session, false otherwise.
+     *
      * @param Player $player
      * @return bool
      */
     public function isLogined(Player $player) : bool {
-        return false;
+        return false; //TODO
     }
 
     /**
+     * Returns true when player has online session, false otherwise.
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isPlaying(Player $player) : bool {
+        return false; //TODO
+    }
+
+    /**
+     * Registers the player on the server.
+     * Returns false if the player was already registered or an error occurred,
+     * true if registration was successful.
+     *
      * @param Player $player
      * @param string $password
      * @return bool
@@ -81,6 +99,8 @@ class UserSystem extends PluginBase implements Listener {
     public function register(Player $player, string $password) : bool {
         if($this->isRegistered($player)) {
             return false;
+        } else {
+            return $this->addUser($player, $password);
         }
     }
 
@@ -106,7 +126,15 @@ class UserSystem extends PluginBase implements Listener {
     }
 
     /**
-     * Returns setting from configuration file by key.
+     * If key is simple: returns setting from configuration file by key.
+     * If $query is several keys separated by a dot: iterates the keys
+     * through the arrays up to the last one in the request and returns the value
+     *
+     * Examples:
+     * query "server_name" will return $this->config->get("server_name")
+     *
+     * query "registration.form.title" will iterate array "registration",
+     * then "form" and will return value by key "title" of "form" array
      *
      * @param string $query
      * @return mixed
@@ -152,6 +180,14 @@ class UserSystem extends PluginBase implements Listener {
     }
 
     /**
+     * Regular expression checks if the password contains:
+     * at least one lowercase latin letter [a-z]
+     * at least one uppercase latin letter [A-Z]
+     * at least one number [0-9]
+     * at least one special character
+     * does not contain spaces
+     * and contains at least 8 characters
+     *
      * @param string $text
      * @return bool
      */
