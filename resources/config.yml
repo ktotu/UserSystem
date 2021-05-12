@@ -1,4 +1,16 @@
 ---
+provider: "sqlite"
+
+sqlite:
+  path: "%data"
+  name: "users.db"
+
+mysqli:
+  host: "127.0.0.1"
+  username: "root"
+  password: "password"
+  name: "database"
+
 registration:
   form:
     title: "Registration"

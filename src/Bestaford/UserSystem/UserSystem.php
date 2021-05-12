@@ -6,12 +6,15 @@ namespace Bestaford\UserSystem;
 
 use Bestaford\UserSystem\form\LoginForm;
 use Bestaford\UserSystem\form\RegistrationForm;
+use Bestaford\UserSystem\provider\Provider;
+use Bestaford\UserSystem\provider\SQLite;
+use Bestaford\UserSystem\provider\MySQLi;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\plugin\PluginException;
 use pocketmine\utils\Config;
-use SQLite3;
 
 /**
  * Class UserSystem
@@ -22,18 +25,25 @@ use SQLite3;
 class UserSystem extends PluginBase implements Listener {
 
     const ERROR_MISSING_PROPERTY = "Missing configuration file property: ";
-
-    /** @var SQLite3 */
-    private SQLite3 $database;
+    const ERROR_CANNOT_CREATE_TABLE = "Cannot create database table, please check file or connection";
 
     /** @var Config */
     private Config $config;
 
+    /** @var SQLite|MySQLi */
+    private Provider $database;
+
     public function onEnable() : void {
-        $this->database = new SQLite3($this->getDataFolder()."users.db");
-        $this->database->exec(stream_get_contents($this->getResource("users.sql")));
-        $this->saveResource("config.yml", true); //TODO: save default config without replace
+        $this->saveDefaultConfig();
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
+        if($this->getProperty("provider") == "mysqli") {
+            //TODO
+        } else {
+            $this->database = new SQLite($this);
+        }
+        if(!$this->database->exec(stream_get_contents($this->getResource("users.sql")))) {
+            throw new PluginException(self::ERROR_CANNOT_CREATE_TABLE);
+        }
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->getLogger()->info("Plugin enabled successfully.");
     }
@@ -63,8 +73,10 @@ class UserSystem extends PluginBase implements Listener {
      * @return bool
      */
     public function isRegistered(Player $player) : bool {
-        $name = strtolower($player->getName());
-        return !is_null($this->database->querySingle("SELECT * FROM users WHERE name = '$name'"));
+        $this->database->prepare("SELECT * FROM users WHERE name = ?");
+        $this->database->bindParam(1, strtolower($player->getName()));
+        $this->database->execute();
+        return count($this->database->fetch()) > 0;
     }
 
     /**
@@ -113,16 +125,16 @@ class UserSystem extends PluginBase implements Listener {
      * @return bool
      */
     private function addUser(Player $player, string $password) : bool {
-        $statement = $this->database->prepare("INSERT INTO users (name, full_name, display_name, password_hash, address, uuid, xuid) VALUES (:name, :full_name, :display_name, :password_hash, :address, :uuid, :xuid)");
-        $statement->bindValue(":name", strtolower($player->getName()));
-        $statement->bindValue(":full_name", $player->getName());
-        $statement->bindValue(":display_name", $player->getDisplayName());
-        $statement->bindValue(":password_hash", password_hash($password, PASSWORD_DEFAULT));
-        $statement->bindValue(":address", $player->getAddress());
-        $statement->bindValue(":uuid", $player->getUniqueId()->toString());
-        $statement->bindValue(":xuid", $player->getXuid());
-        $statement->execute();
-        return $this->database->changes() == 1;
+        $this->database->prepare("INSERT INTO users (name, full_name, display_name, password_hash, address, uuid, xuid) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $this->database->bindParam(1, strtolower($player->getName()));
+        $this->database->bindParam(2, $player->getName());
+        $this->database->bindParam(3, $player->getDisplayName());
+        $this->database->bindParam(4, password_hash($password, PASSWORD_DEFAULT));
+        $this->database->bindParam(5, $player->getAddress());
+        $this->database->bindParam(6, $player->getUniqueId()->toString());
+        $this->database->bindParam(7, $player->getXuid());
+        $this->database->execute();
+        return $this->isRegistered($player);
     }
 
     /**
@@ -140,6 +152,7 @@ class UserSystem extends PluginBase implements Listener {
      * @return mixed
      */
     public function getProperty(string $query) {
+        //TODO: throw exception for safe error handling
         $keys = explode(".", $query);
         if(count($keys) == 1 && $keys[0] == $query) {
             $key = $keys[0];
