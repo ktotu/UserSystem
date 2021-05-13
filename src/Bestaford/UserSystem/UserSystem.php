@@ -6,14 +6,12 @@ namespace Bestaford\UserSystem;
 
 use Bestaford\UserSystem\form\LoginForm;
 use Bestaford\UserSystem\form\RegistrationForm;
-use Bestaford\UserSystem\provider\Provider;
-use Bestaford\UserSystem\provider\SQLite;
-use Bestaford\UserSystem\provider\MySQLi;
+use Bestaford\UserSystem\provider\ProviderInterface;
+use Bestaford\UserSystem\provider\SQLite3Provider;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\plugin\PluginException;
 use pocketmine\utils\Config;
 
 /**
@@ -25,25 +23,38 @@ use pocketmine\utils\Config;
 class UserSystem extends PluginBase implements Listener {
 
     const ERROR_MISSING_PROPERTY = "Missing configuration file property: ";
-    const ERROR_CANNOT_CREATE_TABLE = "Cannot create database table, please check file or connection";
 
     /** @var Config */
     private Config $config;
 
-    /** @var SQLite|MySQLi */
-    private Provider $database;
+    /** @var ProviderInterface */
+    private ProviderInterface $provider;
 
     public function onEnable() : void {
+        $this->loadConfig();
+        $this->loadProvider();
+        $this->init();
+    }
+
+    public function loadConfig() : void {
         $this->saveDefaultConfig();
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
-        if($this->getProperty("provider") == "mysqli") {
-            //TODO
-        } else {
-            $this->database = new SQLite($this);
+    }
+
+    public function loadProvider() : void {
+        switch($this->getProperty("provider")) {
+            case "sqlite":
+                $this->provider = new SQLite3Provider($this);
+                break;
+            case "mysqli":
+                //TODO
+                break;
+            default:
+                $this->provider = new SQLite3Provider($this);
         }
-        if(!$this->database->exec(stream_get_contents($this->getResource("users.sql")))) {
-            throw new PluginException(self::ERROR_CANNOT_CREATE_TABLE);
-        }
+    }
+
+    public function init() : void {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->getLogger()->info("Plugin enabled successfully.");
     }
@@ -73,10 +84,24 @@ class UserSystem extends PluginBase implements Listener {
      * @return bool
      */
     public function isRegistered(Player $player) : bool {
-        $this->database->prepare("SELECT * FROM users WHERE name = ?");
-        $this->database->bindParam(1, strtolower($player->getName()));
-        $this->database->execute();
-        return count($this->database->fetch()) > 0;
+        return $this->provider->isRegistered($player);
+    }
+
+    /**
+     * Registers the player on the server.
+     * Returns false if the player was already registered or an error occurred,
+     * true if registration was successful.
+     *
+     * @param Player $player
+     * @param string $password
+     * @return bool
+     */
+    public function registerPlayer(Player $player, string $password) : bool {
+        if($this->isRegistered($player)) {
+            return false;
+        } else {
+            return $this->provider->registerPlayer($player, $password);
+        }
     }
 
     /**
@@ -90,51 +115,13 @@ class UserSystem extends PluginBase implements Listener {
     }
 
     /**
-     * Returns true when player has online session, false otherwise.
+     * Init player session.
      *
      * @param Player $player
      * @return bool
      */
-    public function isPlaying(Player $player) : bool {
+    public function loginPlayer(Player $player) : bool {
         return false; //TODO
-    }
-
-    /**
-     * Registers the player on the server.
-     * Returns false if the player was already registered or an error occurred,
-     * true if registration was successful.
-     *
-     * @param Player $player
-     * @param string $password
-     * @return bool
-     */
-    public function register(Player $player, string $password) : bool {
-        if($this->isRegistered($player)) {
-            return false;
-        } else {
-            return $this->addUser($player, $password);
-        }
-    }
-
-    /**
-     * Writes data about a new player to the database.
-     * Returns true if the row was written successfully, false otherwise.
-     *
-     * @param Player $player
-     * @param string $password
-     * @return bool
-     */
-    private function addUser(Player $player, string $password) : bool {
-        $this->database->prepare("INSERT INTO users (name, full_name, display_name, password_hash, address, uuid, xuid) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $this->database->bindParam(1, strtolower($player->getName()));
-        $this->database->bindParam(2, $player->getName());
-        $this->database->bindParam(3, $player->getDisplayName());
-        $this->database->bindParam(4, password_hash($password, PASSWORD_DEFAULT));
-        $this->database->bindParam(5, $player->getAddress());
-        $this->database->bindParam(6, $player->getUniqueId()->toString());
-        $this->database->bindParam(7, $player->getXuid());
-        $this->database->execute();
-        return $this->isRegistered($player);
     }
 
     /**

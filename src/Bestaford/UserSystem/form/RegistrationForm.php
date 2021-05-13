@@ -28,7 +28,7 @@ class RegistrationForm extends CustomForm {
             }
             $password = $data["password"];
             if(UserSystem::isValidPassword($password)) {
-                $this->getPlugin()->register($player, $password);
+                $this->getPlugin()->registerPlayer($player, $password);
             } else {
                 $player->sendForm(new RegistrationForm($this->getPlugin(), true));
             }
