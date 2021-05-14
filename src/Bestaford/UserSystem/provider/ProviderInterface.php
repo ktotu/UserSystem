@@ -38,4 +38,11 @@ interface ProviderInterface {
      * @return bool
      */
     public function registerPlayer(Player $player, string $password) : bool;
+
+    /**
+     * Returns provider name.
+     *
+     * @return string
+     */
+    public function getName() : string;
 }

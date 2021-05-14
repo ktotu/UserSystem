@@ -4,12 +4,9 @@ declare(strict_types = 1);
 
 namespace Bestaford\UserSystem;
 
-use Bestaford\UserSystem\form\LoginForm;
-use Bestaford\UserSystem\form\RegistrationForm;
+use Bestaford\UserSystem\module\Authorization;
 use Bestaford\UserSystem\provider\ProviderInterface;
 use Bestaford\UserSystem\provider\SQLite3Provider;
-use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
@@ -20,9 +17,12 @@ use pocketmine\utils\Config;
  * @link https://talk.24serv.pro/u/bestaford
  * @package Bestaford\UserSystem
  */
-class UserSystem extends PluginBase implements Listener {
+class UserSystem extends PluginBase {
 
     const ERROR_MISSING_PROPERTY = "Missing configuration file property: ";
+
+    /** @var UserSystem|null */
+    private static ?UserSystem $instance = null;
 
     /** @var Config */
     private Config $config;
@@ -30,18 +30,34 @@ class UserSystem extends PluginBase implements Listener {
     /** @var ProviderInterface */
     private ProviderInterface $provider;
 
+    /** @var bool */
+    private bool $loaded = false;
+
+    /**
+     * Set instance, loads config, data and modules.
+     */
     public function onEnable() : void {
+        self::$instance = $this;
         $this->loadConfig();
         $this->loadProvider();
-        $this->init();
+        $this->loadModules();
     }
 
-    public function loadConfig() : void {
-        $this->saveDefaultConfig();
+    /**
+     * Loads the config or copies the standard one.
+     */
+    private function loadConfig() : void {
+        if($this->saveDefaultConfig()) {
+            $this->getLogger()->info("Copied default config");
+        }
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
+        $this->getLogger()->info("Config loaded");
     }
 
-    public function loadProvider() : void {
+    /**
+     * Selects a data provider and creates a connection.
+     */
+    private function loadProvider() : void {
         switch($this->getProperty("provider")) {
             case "sqlite":
                 $this->provider = new SQLite3Provider($this);
@@ -52,28 +68,19 @@ class UserSystem extends PluginBase implements Listener {
             default:
                 $this->provider = new SQLite3Provider($this);
         }
-    }
-
-    public function init() : void {
-        $this->getServer()->getPluginManager()->registerEvents($this, $this);
-        $this->getLogger()->info("Plugin enabled successfully.");
+        $this->getLogger()->info("Data provider: ".$this->provider->getName());
     }
 
     /**
-     * Send registration or login form when player join.
-     *
-     * @param PlayerJoinEvent $event
+     * Loads enabled modules from config.
      */
-    public function onPlayerJoin(PlayerJoinEvent $event) : void {
-        $player = $event->getPlayer();
-        if($this->isRegistered($player)) {
-            if($this->isLogined($player)) {
-
-            } else {
-                $player->sendForm(new LoginForm($this));
+    private function loadModules() : void {
+        if(!$this->loaded) {
+            if($this->getProperty("authorization.enable")) {
+                $this->getServer()->getPluginManager()->registerEvents(new Authorization(), $this);
             }
-        } else {
-            $player->sendForm(new RegistrationForm($this));
+            $this->loaded = true;
+            $this->getLogger()->info("Plugin enabled successfully");
         }
     }
 
@@ -193,5 +200,12 @@ class UserSystem extends PluginBase implements Listener {
      */
     public static function isValidPassword(string $text) : bool {
         return preg_match("/^(?=\S+[0-9])(?=\S+[a-z])(?=\S+[A-Z])(?=\S+\W).{8,}$/", $text) == 1;
+    }
+
+    /**
+     * @return UserSystem
+     */
+    public static function getInstance() : UserSystem {
+        return self::$instance;
     }
 }

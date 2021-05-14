@@ -22,17 +22,12 @@ abstract class Form implements IForm {
     /** @var callable|null */
     private $callable;
 
-    /** @var UserSystem */
-    private UserSystem $plugin;
-
     /**
      * Form constructor.
      * @param callable|null $callable
-     * @param UserSystem $plugin
      */
-    public function __construct(?callable $callable, UserSystem $plugin) {
+    public function __construct(?callable $callable) {
         $this->callable = $callable;
-        $this->plugin = $plugin;
     }
 
     /**
@@ -78,6 +73,6 @@ abstract class Form implements IForm {
      * @return UserSystem
      */
     public function getPlugin() : UserSystem {
-        return $this->plugin;
+        return UserSystem::getInstance();
     }
 }

@@ -62,4 +62,13 @@ class SQLite3Provider implements ProviderInterface {
         $statement->execute();
         return $this->database->changes() == 1;
     }
+
+    /**
+     * Returns provider name.
+     *
+     * @return string
+     */
+    public function getName() : string {
+        return "SQLite3";
+    }
 }

@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Bestaford\UserSystem\form;
 
-use Bestaford\UserSystem\UserSystem;
-
 /**
  * Class CustomForm
  * @author jojoe77777
@@ -20,10 +18,9 @@ class CustomForm extends Form {
     /**
      * CustomForm constructor.
      * @param callable|null $callable
-     * @param UserSystem $plugin
      */
-    public function __construct(?callable $callable, UserSystem $plugin) {
-        parent::__construct($callable, $plugin);
+    public function __construct(?callable $callable) {
+        parent::__construct($callable);
         $this->data["type"] = "custom_form";
         $this->data["title"] = "";
         $this->data["content"] = [];

@@ -11,13 +11,15 @@ mysqli:
   password: "password"
   name: "database"
 
-registration:
-  form:
-    title: "Registration"
-    label: "Label"
-    input:
-      text: "Text"
-      placeholder: "Placeholder"
-      default: "Default"
-    success: "Success"
+authorization:
+  enable: true
+  registration:
+    form:
+      title: "Registration"
+      label: "Label"
+      input:
+        text: "Text"
+        placeholder: "Placeholder"
+        default: "Default"
+      success: "Success"
 ...
