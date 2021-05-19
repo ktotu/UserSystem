@@ -80,55 +80,8 @@ class UserSystem extends PluginBase {
                 $this->getServer()->getPluginManager()->registerEvents(new Authorization(), $this);
             }
             $this->loaded = true;
-            $this->getLogger()->info("Plugin enabled successfully");
+            $this->getLogger()->info("Plugin loaded successfully");
         }
-    }
-
-    /**
-     * Returns true if the player is registered, false otherwise. Name is case insensitive.
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isRegistered(Player $player) : bool {
-        return $this->provider->isRegistered($player);
-    }
-
-    /**
-     * Registers the player on the server.
-     * Returns false if the player was already registered or an error occurred,
-     * true if registration was successful.
-     *
-     * @param Player $player
-     * @param string $password
-     * @return bool
-     */
-    public function registerPlayer(Player $player, string $password) : bool {
-        if($this->isRegistered($player)) {
-            return false;
-        } else {
-            return $this->provider->registerPlayer($player, $password);
-        }
-    }
-
-    /**
-     * Returns true when player has online or offline session, false otherwise.
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isLogined(Player $player) : bool {
-        return false; //TODO
-    }
-
-    /**
-     * Init player session.
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function loginPlayer(Player $player) : bool {
-        return false; //TODO
     }
 
     /**

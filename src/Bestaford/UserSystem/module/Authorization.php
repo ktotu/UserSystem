@@ -6,6 +6,7 @@ namespace Bestaford\UserSystem\module;
 
 use Bestaford\UserSystem\form\LoginForm;
 use Bestaford\UserSystem\form\RegistrationForm;
+use Bestaford\UserSystem\utils\Session;
 use pocketmine\event\player\PlayerJoinEvent;
 
 /**
@@ -15,6 +16,9 @@ use pocketmine\event\player\PlayerJoinEvent;
  * @package Bestaford\UserSystem
  */
 class Authorization extends Module {
+
+    /** @var Session[] */
+    private array $sessions = [];
 
     /**
      * Send registration or login form when player join.
